@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <title>WhatsApp API node js</title>
+        <style>
+            #qrcode{
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="app">
+            <h1>WhatsApp API</h1>
+            <p>Powewred by pendekar koding</p>
+            <img src="" alt="QR Code" id="qrcode">
+            <h3>Logs:</h3>
+            <ul class="logs"></ul>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.5/socket.io.min.js" integrity="sha512-L9L4VhE0D58fCxtJiYDHbIzSVfNGY24rhQPWTZPschTVKLpucPsLeT0FSjfnylLYARalTQqgwXsjjhi+wUTwIw==" crossorigin="anonymous"></script>
+        <script>
+            $(document).ready(function(){
+                
+                var socket = io.connect('http://localhost:8000', {path: '/socket.io'});
+                
+                socket.on('message', function(msg){
+                    $('.logs').html($('<li>').text(msg));
+                });
+
+                socket.on('qr', function(src){
+                    $('#qrcode').attr('src', src);
+                    $('#qrcode').css('display','block');
+                });
+
+                socket.on('ready', function(src){
+                    $('#qrcode').css('display','none');
+                });
+
+                socket.on('authenticated', function(src){
+                    $('#qrcode').css('display','none');
+                });
+
+            });
+        </script>
+    </body>
+</html>
