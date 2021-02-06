@@ -39,6 +39,11 @@
                     $('#qrcode').css('display','none');
                 });
 
+                socket.on('remove-session', function(id) {
+                    $('#qrcode').attr('src', src);
+                    $('#qrcode').css('display','block');
+                });
+
             });
         </script>
     </body>

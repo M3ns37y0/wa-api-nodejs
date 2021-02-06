@@ -41,11 +41,12 @@ const client = new Client({
 });
 
 client.on('message', msg => {
-    if (msg.body == '!ping') {
-        msg.reply('pong');
-    }else if (msg.body == 'lagi apa ?'){
-        msg.reply('lagi ngopi !');
+    if (msg.body == 'Ok' || msg.body == 'ok') {
+        msg.reply('Sip!');
+    }else{
+        msg.reply('Halo, saya Robot, Si Bos sedang maintenance sistem, jika sudah selesai Si Bos akan menghubungi anda kembali, tks ya !');
     }
+    
 });
 
 client.initialize();
@@ -55,7 +56,7 @@ io.on('connection', function(socket){
     socket.emit('message', 'Connecting...');
 
     client.on('qr', (qr) => {
-        console.log('QR RECEIVED', qr);
+        // console.log('QR RECEIVED', qr);
         qrcode.toDataURL(qr, (err, url) => {
             socket.emit('qr', url);
             socket.emit('message', 'Silahkan scan QR Code!');
@@ -77,6 +78,18 @@ io.on('connection', function(socket){
             }
         });
     });    
+
+    client.on('disconnected', (reason) => {
+        socket.emit('message', 'Whatsapp telah disconnected!');
+        fs.unlinkSync(SESSION_FILE_PATH, function(err) {
+            if(err) return console.log(err);
+            // console.log('Session file deleted!');
+        });
+        client.destroy();
+        client.initialize();
+
+        soket.emit('remove-session', id);
+    });
 
 });
 
