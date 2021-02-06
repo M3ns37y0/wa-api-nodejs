@@ -11,8 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = soketIO(server);
 
-const hostname = '0.0.0.0';
-const port = 8000;
+const port = process.env.PORT || 8000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
@@ -141,6 +140,6 @@ app.post('/kirim-pesan', [
     });
 });
 
-server.listen(port, hostname, function(){
-    console.log("App berjalan di "+hostname +"port 8000");
+server.listen(port, function(){
+    console.log("App berjalan di port 8000");
 });
