@@ -11,8 +11,6 @@ const app = express();
 const server = http.createServer(app);
 const io = soketIO(server);
 
-const port = process.env.PORT || 8000;
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
 
@@ -29,13 +27,7 @@ const client = new Client({
     puppeteer: { 
         args: [
             '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--no-first-run',
-            '--no-zygote',
-            '--single-process',
-            '--disable-gpu'
+            '--disable-setuid-sandbox'
           ],
         headless: true 
     }, 
@@ -140,6 +132,6 @@ app.post('/kirim-pesan', [
     });
 });
 
-server.listen(port, function(){
+server.listen(process.env.PORT || 8000, function(){
     console.log("App berjalan di port 8000");
 });

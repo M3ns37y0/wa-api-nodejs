@@ -2,8 +2,12 @@
     <head>
         <title>WhatsApp API node js</title>
         <style>
-            #qrcode{
+           #qrcode, #form{
                 display: none;
+            }
+            h3{
+                margin: 0px;
+                padding: 0px;
             }
         </style>
     </head>
@@ -14,6 +18,16 @@
             <img src="" alt="QR Code" id="qrcode">
             <h3>Logs:</h3>
             <ul class="logs"></ul>
+
+            <div id="form">
+                <h1>Test Kirim Pesan ke WA</h1>
+                <h3>No WA</h3>
+                <input type="text" name="number" id="number">
+                <h3>Pesan</h3>
+                <input type="text" name="message" id="message">
+                <button type="button" name="submit" id="kirim">Kirim Pesan</button>
+            </div>
+
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.5/socket.io.min.js" integrity="sha512-L9L4VhE0D58fCxtJiYDHbIzSVfNGY24rhQPWTZPschTVKLpucPsLeT0FSjfnylLYARalTQqgwXsjjhi+wUTwIw==" crossorigin="anonymous"></script>
@@ -29,20 +43,38 @@
                 socket.on('qr', function(src){
                     $('#qrcode').attr('src', src);
                     $('#qrcode').css('display','block');
+                    $('#form').css('display','none');
                 });
 
                 socket.on('ready', function(src){
                     $('#qrcode').css('display','none');
+                    $('#form').css('display','block');
                 });
 
                 socket.on('authenticated', function(src){
                     $('#qrcode').css('display','none');
+                    $('#form').css('display','block');
                 });
 
                 socket.on('remove-session', function(id) {
-                    $('#qrcode').attr('src', src);
                     $('#qrcode').css('display','block');
                 });
+
+                $('#kirim').on('click', function(){
+                    $.ajax({ 
+                        url: '/kirim-pesan',
+                        type: 'POST',
+                        cache: false, 
+                        data: { number: $('#number').val(), message: $('#message').val() }, 
+                        success: function(data){
+                            if(data['status']==true){
+                                alert('pesan berhasil dikirim !');
+                            }else{
+                                alert('pesan gagal dikirim !');
+                            }
+                        }
+                    })
+                })
 
             });
         </script>
