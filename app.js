@@ -24,10 +24,19 @@ app.get('/', (req, res) => {
     res.sendFile('index.html', {root:__dirname});
 });
 const client = new Client({ 
+    qrTimeoutMs: 90000,
+    authTimeoutMs: 120000,
+    restartOnAuthFail: true,
     puppeteer: { 
         args: [
             '--no-sandbox',
-            '--disable-setuid-sandbox'
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process',
+            '--disable-gpu'
           ],
         headless: true 
     }, 
@@ -47,8 +56,14 @@ client.initialize();
 
 //soket io
 io.on('connection', function(socket){
-    socket.emit('message', 'Connecting...');
 
+    if (fs.existsSync(SESSION_FILE_PATH)) {
+        socket.emit('ready', 'WhatsApp sudah siap!');
+        socket.emit('message', 'WhatsApp sudah siap!');
+    }else{
+        socket.emit('message', 'Connecting...');
+    }
+    
     client.on('qr', (qr) => {
         // console.log('QR RECEIVED', qr);
         qrcode.toDataURL(qr, (err, url) => {
@@ -73,16 +88,31 @@ io.on('connection', function(socket){
         });
     });    
 
+    client.on('auth_failure', msg => {
+        console.log('Auth fail ',msg)
+        if (fs.existsSync(SESSION_FILE_PATH)) {
+            fs.unlinkSync(SESSION_FILE_PATH, function(err) {
+                if(err) return console.log(err);
+            });
+        }
+        
+        client.destroy();
+        client.initialize();
+        soket.emit('auth-fail', '01');
+    });
+    
+
     client.on('disconnected', (reason) => {
         socket.emit('message', 'Whatsapp telah disconnected!');
-        fs.unlinkSync(SESSION_FILE_PATH, function(err) {
-            if(err) return console.log(err);
-            // console.log('Session file deleted!');
-        });
+        if (fs.existsSync(SESSION_FILE_PATH)) {
+            fs.unlinkSync(SESSION_FILE_PATH, function(err) {
+                if(err) return console.log(err);
+            });
+        }
         client.destroy();
         client.initialize();
 
-        soket.emit('remove-session', id);
+        soket.emit('remove-session', '01');
     });
 
 });

@@ -60,6 +60,11 @@
                     $('#qrcode').css('display','block');
                 });
 
+                socket.on('auth-fail', function(id) {
+                    $('#qrcode').css('display','block');
+                    $('#form').css('display','none');
+                });
+
                 $('#kirim').on('click', function(){
                     $.ajax({ 
                         url: '/kirim-pesan',
